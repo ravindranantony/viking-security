@@ -1,104 +1,87 @@
-import { urlSecurityTests } from '../utils/urlTests';
+import { useState } from 'react';
+import { initialTests } from '../data/initialTests';
+import { additionalTests } from '../data/additionalTests';
+import { securityPatterns } from '../utils/securityPatterns';
 
-// Inside your main testing component/function
-const handleTestUrl = async (url: string) => {
-  const results = [];
-  
-  // Run through all security tests
-  for (const test of urlSecurityTests) {
-    const result = test.test(url);
-    if (result.severity !== 'Low') {  // Only show medium and above severity
-      results.push({
-        testName: test.name,
-        ...result
-      });
+export const SecurityTester = () => {
+  const [url, setUrl] = useState('');
+  const [results, setResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const allTests = [...initialTests, ...additionalTests];
+
+  const runSecurityTests = async () => {
+    setIsLoading(true);
+    try {
+      const testResults = await Promise.all(
+        allTests.map(async (test) => {
+          const result = await test.test(url);
+          return {
+            name: test.name,
+            icon: test.icon,
+            category: test.category,
+            result,
+            message: result.vulnerable ? test.vulnerabilityMessage : test.safetyMessage,
+            recommendation: test.recommendation,
+            findings: result.findings
+          };
+        })
+      );
+      setResults(testResults);
+    } catch (error) {
+      console.error('Security test error:', error);
     }
-  }
+    setIsLoading(false);
+  };
 
-  // Update the UI with results
-  setTestResults(results);
-};
-
-// Update the results display component to show the new test results
-const DisplayResults = ({ results }) => {
   return (
-    <div className="mt-4">
-      {results.map((result, index) => (
-        <div key={index} className="mb-4 p-4 rounded-lg bg-white shadow">
-          <h3 className="font-bold text-lg">{result.testName}</h3>
-          <div className={`text-sm mt-1 ${
-            result.severity === 'Critical' ? 'text-red-600' :
-            result.severity === 'High' ? 'text-orange-600' :
-            result.severity === 'Medium' ? 'text-yellow-600' : 'text-green-600'
-          }`}>
-            Severity: {result.severity}
+    <div className="p-4">
+      <div className="mb-4">
+        <input
+          type="url"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Enter URL to test"
+          className="w-full p-2 border rounded"
+        />
+        <button
+          onClick={runSecurityTests}
+          disabled={isLoading}
+          className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          {isLoading ? 'Testing...' : 'Run Security Tests'}
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        {results.map((result, index) => (
+          <div key={index} className="p-4 border rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              {result.icon}
+              <h3 className="font-bold">{result.name}</h3>
+            </div>
+            <div className={`p-2 rounded ${
+              result.result.vulnerable ? 'bg-red-100' : 'bg-green-100'
+            }`}>
+              <p>{result.message}</p>
+            </div>
+            {result.result.findings?.length > 0 && (
+              <div className="mt-2">
+                <h4 className="font-semibold">Findings:</h4>
+                <ul className="list-disc pl-5">
+                  {result.result.findings.map((finding, i) => (
+                    <li key={i}>{finding}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className="mt-2">
+              <h4 className="font-semibold">Recommendation:</h4>
+              <p className="text-gray-600">{result.recommendation}</p>
+            </div>
           </div>
-          <p className="mt-2 text-gray-700">{result.description}</p>
-          <p className="mt-2 text-gray-600 text-sm">
-            <strong>Recommendation:</strong> {result.recommendation}
-          </p>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
-};
-
-// Add this function alongside your existing security checks
-const checkBrokenAccessControl = (url: string) => {
-  const issues = [];
-  
-  // Check for sensitive administrative endpoints
-  if (/(admin|dashboard|config|settings|users)/i.test(url)) {
-    issues.push({
-      type: 'Broken Access Control',
-      severity: 'High',
-      finding: 'Sensitive administrative endpoint detected',
-      recommendation: 'Ensure proper authentication and authorization controls are in place'
-    });
-  }
-
-  // Check for exposed IDs in URL
-  if (/[?&](id|user_id|account)=/i.test(url)) {
-    issues.push({
-      type: 'Broken Access Control',
-      severity: 'High',
-      finding: 'Potential Insecure Direct Object Reference (IDOR)',
-      recommendation: 'Use indirect references or implement proper access controls'
-    });
-  }
-
-  // Check for directory traversal attempts
-  if (/\.\./i.test(url)) {
-    issues.push({
-      type: 'Broken Access Control',
-      severity: 'Critical',
-      finding: 'Directory traversal pattern detected',
-      recommendation: 'Validate and sanitize file paths, implement proper access controls'
-    });
-  }
-
-  // Check for unauthorized API endpoints
-  if (/\/api\/|\/v1\/|\/v2\//i.test(url)) {
-    issues.push({
-      type: 'Broken Access Control',
-      severity: 'Medium',
-      finding: 'API endpoint detected - verify access controls',
-      recommendation: 'Implement proper API authentication and authorization'
-    });
-  }
-
-  return issues;
-};
-
-// Add this to your main security check function
-const handleSecurityCheck = async (url: string) => {
-  const results = [];
-  
-  // Add broken access control checks
-  const accessControlIssues = checkBrokenAccessControl(url);
-  results.push(...accessControlIssues);
-  
-  // Your existing security checks...
-  
-  return results;
 };
