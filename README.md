@@ -31,6 +31,9 @@ Feature Ideas: Share your thoughts on what you'd like to see next. We're always 
 Every contribution, no matter the size, is valuable and helps make Viking Security stronger and more effective.
 Join the discussion, contribute, and be a part of building a secure future together. Visit our GitHub page and star the repository if you find it useful!
 
+![image](https://github.com/user-attachments/assets/9e89ea93-c87f-42bf-b4db-b82cab1e34d6)
+
+
 **Let's Secure the Future, Together!**
 
 Security is not just about tools—it's about the people who use them and the community that helps them grow. Your skills and insights are crucial to making Viking Security a tool that developers around the world can trust and rely on.
