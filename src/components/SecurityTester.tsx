@@ -43,40 +43,62 @@ const DisplayResults = ({ results }) => {
   );
 };
 
-// Add this test to your existing tests
-const brokenAccessControlTest = {
-  name: 'Broken Access Control',
-  test: (url: string) => {
-    // Check for sensitive endpoints
-    const sensitiveEndpoints = /(admin|dashboard|config|settings|users)/i.test(url);
-    // Check for exposed IDs in URL
-    const hasIdParams = /[?&](id|user_id|account)=/i.test(url);
-    // Check for directory traversal
-    const hasTraversal = /\.\./i.test(url);
-    
-    let findings = [];
-    let severity = 'Low';
-    
-    if (sensitiveEndpoints) {
-      findings.push('Sensitive administrative endpoints detected');
-      severity = 'High';
-    }
-    
-    if (hasIdParams) {
-      findings.push('Potential Insecure Direct Object References (IDOR)');
-      severity = 'High';
-    }
-    
-    if (hasTraversal) {
-      findings.push('Directory traversal attempt detected');
-      severity = 'Critical';
-    }
-
-    return {
-      vulnerability: 'Broken Access Control',
-      severity: severity,
-      description: findings.length > 0 ? findings.join('. ') : 'No obvious access control issues detected',
-      recommendation: 'Implement proper authorization checks, avoid exposing IDs in URLs, and validate user permissions'
-    };
+// Add this function alongside your existing security checks
+const checkBrokenAccessControl = (url: string) => {
+  const issues = [];
+  
+  // Check for sensitive administrative endpoints
+  if (/(admin|dashboard|config|settings|users)/i.test(url)) {
+    issues.push({
+      type: 'Broken Access Control',
+      severity: 'High',
+      finding: 'Sensitive administrative endpoint detected',
+      recommendation: 'Ensure proper authentication and authorization controls are in place'
+    });
   }
-}; 
+
+  // Check for exposed IDs in URL
+  if (/[?&](id|user_id|account)=/i.test(url)) {
+    issues.push({
+      type: 'Broken Access Control',
+      severity: 'High',
+      finding: 'Potential Insecure Direct Object Reference (IDOR)',
+      recommendation: 'Use indirect references or implement proper access controls'
+    });
+  }
+
+  // Check for directory traversal attempts
+  if (/\.\./i.test(url)) {
+    issues.push({
+      type: 'Broken Access Control',
+      severity: 'Critical',
+      finding: 'Directory traversal pattern detected',
+      recommendation: 'Validate and sanitize file paths, implement proper access controls'
+    });
+  }
+
+  // Check for unauthorized API endpoints
+  if (/\/api\/|\/v1\/|\/v2\//i.test(url)) {
+    issues.push({
+      type: 'Broken Access Control',
+      severity: 'Medium',
+      finding: 'API endpoint detected - verify access controls',
+      recommendation: 'Implement proper API authentication and authorization'
+    });
+  }
+
+  return issues;
+};
+
+// Add this to your main security check function
+const handleSecurityCheck = async (url: string) => {
+  const results = [];
+  
+  // Add broken access control checks
+  const accessControlIssues = checkBrokenAccessControl(url);
+  results.push(...accessControlIssues);
+  
+  // Your existing security checks...
+  
+  return results;
+};

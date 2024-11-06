@@ -7,6 +7,14 @@ interface TestResultsProps {
 }
 
 export default function TestResults({ tests }: TestResultsProps) {
+  // Add severity color mapping
+  const severityColors = {
+    Critical: 'text-red-600',
+    High: 'text-orange-600',
+    Medium: 'text-yellow-600',
+    Low: 'text-green-600'
+  };
+
   return (
     <div className="space-y-4">
       {tests.map((test, index) => (
