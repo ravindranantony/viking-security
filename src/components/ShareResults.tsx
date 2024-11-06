@@ -39,7 +39,8 @@ OWASP Reference: ${test.owaspLink || 'N/A'}
       </button>
       
       <p className="mt-4 text-sm text-gray-600 text-center">
-        Security Testing Tool by ravi
+        Security Testing Tool by ravi <a href="https://x.com/senthazalravi" target="_blank" rel="noopener noreferrer">https://x.com/senthazalravi</a>
+        Contributed by <a href="https://github.com/ravindranantony/viking-security/" target="_blank" rel="noopener noreferrer">Open Source Repo</a>
       </p>
     </div>
   );
