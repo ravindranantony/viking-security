@@ -1,7 +1,10 @@
 **Viking Security: A Versatile Open Source Security Testing Tool**
 
 Viking Security is an open-source initiative designed to help individuals and organizations strengthen their software security through automated testing. Built for flexibility, Viking Security empowers developers, security researchers, and DevOps teams to identify vulnerabilities, ensure compliance, and take proactive measures against potential security threats. With a focus on being community-driven, Viking Security is built to be extensible, user-friendly, and well-suited for both small-scale applications and enterprise environments.
-Key Features
+
+![image](https://github.com/user-attachments/assets/d68b9b33-0269-48ab-862b-f64eb62a21e8)
+
+**Key Features**
 
 Comprehensive Vulnerability Scanning: Automated scanning for common vulnerabilities such as SQL injection, XSS, CSRF, and more.
 Customizable Test Modules: Easily extend or create your own test modules to suit the unique security requirements of your application.
